@@ -13,4 +13,5 @@ In turn you will receive data from the public API that is written to your `fruit
 If there is an error then on the console it should notify you of the error with either 'Error fetching API' or 'Failed to write to fruits.txt'
 
 ## UML Sequence Diagram
-!(<img width="987" alt="Screen Shot 2023-11-20 at 2 50 28 PM" src="https://github.com/anisar17/CS361-MicroService/assets/111161857/3d9cee44-1ff3-42a4-8f51-a3ed6f209295">)
+<img width="987" alt="CS361-UML" src="https://github.com/anisar17/CS361-MicroService/assets/111161857/f3837d11-358e-499e-a52e-3364e2f3a01c">
+
