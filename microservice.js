@@ -1,30 +1,42 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 
-console.log('MicroService fetching data...');
+console.log('Running microservice...');
 
-fs.readFile('fruits.txt', 'utf-8', (err, content) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
+async function readFile() {
+    try {
+        const fileResult = await fs.readFile('fruits.txt');
+        const data = fileResult.toString();
 
-  const fruit = content.replace('Please enter a fruit name: ', ' ').trim();
-
-  fetch(`https://www.fruityvice.com/api/fruit/${fruit}`)
-    .then(response => response.json())
-    .then(data => {
-      const nutrition = data.nutritions;
-      console.log(nutrition);
-
-      fs.writeFile('fruits.txt', JSON.stringify(nutrition), 'utf-8', (err) => {
-        if (err) {
-          console.error('Failed to write to fruits.txt', err);
-        } else {
-          console.log('Data written to fruits.txt');
+        if (data.startsWith('Please enter a fruit name: ')) {
+          const fruit = data.replace('Please enter a fruit name: ', '').trim();
+          await getFruitNutrition(fruit);
+          process.exit(0);
         }
-      });
-    })
-    .catch(error => {
-      console.error('Error fetching API.', error);
-    });
-});
+    } catch (error) {
+        console.error('Cannot read file', error);
+    }
+}
+
+async function getFruitNutrition(fruit) {
+    try {
+        const response = await fetch(`https://www.fruityvice.com/api/fruit/${fruit}`);
+        const info = await response.json();
+
+        const nutrition = info.nutritions;
+        console.log(nutrition);
+
+        const formattedData = `Nutrition for ${info.name}:\n` +
+            `Calories: ${nutrition.calories} cal\n` +
+            `Fat: ${nutrition.fat} g\n` +
+            `Sugar: ${nutrition.sugar} g\n` +
+            `Carbohydrates: ${nutrition.carbohydrates} g\n` +
+            `Protein: ${nutrition.protein} g`;
+
+        await fs.writeFile('fruits.txt', formattedData, 'utf-8');
+        console.log('Nutrition data written to fruits.txt');
+    } catch (error) {
+        console.error('Error fetching API', error);
+    }
+}
+
+setTimeout(readFile, 2000);
